@@ -48,7 +48,7 @@ class MapReduce(ABC):
 
     with open(tempOutputPath, 'r') as tempOutput:
       for line in tempOutput:
-        [ key, value ] = line.strip().split(' ')
+        [ key, value ] = line.strip().split(' ', 1)
 
         if(self.mapper.get(key) is None):
           self.mapper[key] = [ value ]
