@@ -42,7 +42,11 @@ class MapReduce(ABC):
   def collect(self):
     self.mapper = {}
 
-    with open(os.path.join(self.outputPath, "output.tmp"), 'r') as tempOutput:
+    tempOutputPath = os.path.join(self.outputPath, "output.tmp")
+
+    if(not os.path.exists(tempOutputPath)): return
+
+    with open(tempOutputPath, 'r') as tempOutput:
       for line in tempOutput:
         [ key, value ] = line.strip().split(' ')
 
