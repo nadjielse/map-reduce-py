@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import os
 from collections.abc import Iterable
+from threading import Lock
 
 class MapReduce(ABC):
 
@@ -8,6 +9,7 @@ class MapReduce(ABC):
     self.inputPath = inputPath
     self.inputName = inputName
     self.outputPath = outputPath
+    self.lock = Lock()
 
     self.readInput()
 
@@ -28,10 +30,14 @@ class MapReduce(ABC):
     self.output.close()
 
   def emitIntermediate(self, key: str, value: str):
+    self.lock.acquire()
+
     if(not hasattr(self, "tempOutput")):
       self.openTempOutput()
     
     self.tempOutput.write(key + ' ' + value + "\n")
+    
+    self.lock.release()
 
   def emit(self, key: str, value: str):
     if(not hasattr(self, "output")):

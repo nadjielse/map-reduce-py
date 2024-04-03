@@ -1,7 +1,6 @@
 import sys
 from os import listdir, path, remove
-from subprocess import run
-from threading import Thread
+from threading import Thread, Lock
 
 from grep import Grep
 
@@ -11,10 +10,7 @@ if __name__ == "__main__":
 
   search = sys.argv[1]
   regex = sys.argv[2] == "True"
-  input = "./input"
-
-  if(not path.exists(input)):
-    run([ "python", "./generateInput.py" ], check=True)
+  input = "./input_grep"
 
   chunks = len(listdir(input))
   outputPath = "./"
@@ -27,11 +23,12 @@ if __name__ == "__main__":
 
   greps = []
   threads = []
+  lock = Lock()
 
   for i in reversed(range(chunks)):
     greps.append(Grep(input, "chunk" + str(i), search, regex=regex))
 
-    threads.append(Thread(target = greps[-1].map))
+    threads.append(Thread(target = greps[-1].map, args=[lock]))
 
     threads[-1].start()
   

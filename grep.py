@@ -1,5 +1,6 @@
 import re
 import collections
+from threading import Lock
 
 from mapReduce import MapReduce
 
@@ -11,7 +12,7 @@ class Grep(MapReduce):
     self.search = search
     self.regex = regex
 
-  def map(self):
+  def map(self, lock: Lock):
     for line in self.input:
       found = False
 
@@ -20,7 +21,9 @@ class Grep(MapReduce):
       else:
         found = line == self.search
       
+      lock.acquire()
       if(found): self.emitIntermediate(self.inputName, line)
+      lock.release()
     
     if(hasattr(self, "tempOutput")): self.closeTempOutput()
 
